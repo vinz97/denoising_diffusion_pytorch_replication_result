@@ -1,4 +1,3 @@
-import os
 import math
 import copy
 import torch
@@ -19,7 +18,6 @@ from tqdm import tqdm
 from einops import rearrange
 from einops.layers.torch import Rearrange
 
-
 # helpers functions
 
 def exists(x):
@@ -33,7 +31,7 @@ def default(val, d):
 def cycle(dl):
     while True:
         for data in dl:
-            yield data.cuda()
+            yield data
 
 def num_to_groups(num, divisor):
     groups = num // divisor
@@ -570,7 +568,7 @@ class Trainer(object):
     def __init__(
         self,
         diffusion_model,
-        folder, 
+        folder,
         *,
         ema_decay = 0.995,
         image_size = 128,
@@ -583,8 +581,7 @@ class Trainer(object):
         update_ema_every = 10,
         save_and_sample_every = 1000,
         results_folder = './results',
-        augment_horizontal_flip = True,
-        #train_dataset
+        augment_horizontal_flip = True
     ):
         super().__init__()
         self.model = diffusion_model
@@ -601,9 +598,6 @@ class Trainer(object):
         self.train_num_steps = train_num_steps
 
         self.ds = Dataset(folder, image_size, augment_horizontal_flip = augment_horizontal_flip)
-        print("self.ds: --> ",self.ds)
-        print("type(self.ds) --> ", type(self.ds))
-        #self.ds = train_dataset
         self.dl = cycle(data.DataLoader(self.ds, batch_size = train_batch_size, shuffle=True, pin_memory=True))
         self.opt = Adam(diffusion_model.parameters(), lr=train_lr)
 
@@ -667,40 +661,14 @@ class Trainer(object):
                     self.ema_model.eval()
 
                     milestone = self.step // self.save_and_sample_every
-
-                    # INIZIO CODICE SCRITTO DA ME 
-
-                    print(milestone)
-
-                    # Print model's state_dict
-                    print("Model's state_dict:")
-                    for param_tensor in self.model.state_dict():
-                        print(param_tensor, "\t", self.model.state_dict()[param_tensor].size())
-
-                    # Print optimizer's state_dict
-                    print("Optimizer's state_dict:")
-                    for var_name in self.opt.state_dict():
-                        print(var_name, "\t", self.opt.state_dict()[var_name])
-                    
-                    save_every = 10
-                    load_checkpoint = True
-                    save_path = '/content/drive/My Drive/risultati'
-                    if not os.path.isdir(save_path):
-                        os.mkdir(save_path)
-
-                    torch.save(self.model.state_dict(), os.path.join(save_path, 'weights.pt'))
-                    torch.save(self.opt.state_dict(), os.path.join(save_path, 'optim.pt'))
-
-                    # FINE CODICE SCRITTO DA ME _______________________________
-                    
                     batches = num_to_groups(36, self.batch_size)
                     all_images_list = list(map(lambda n: self.ema_model.sample(batch_size=n), batches))
                     #all_images = torch.cat(all_images_list, dim=0)
                     for i in range(len(all_images_list)):
-                        utils.save_image(all_images_list[i], str(self.results_folder / f'sample-{i}.png'), nrow = 6)
-                        #utils.save_image(all_images, str(self.results_folder / f'sample-{milestone}.png'), nrow = 6)
+                        utils.save_image(all_images_list[i], str(self.results_folder / f'sample-{i}.png'))
                         self.save(i)
                     #self.save(milestone)
+
                 self.step += 1
                 pbar.update(1)
 
