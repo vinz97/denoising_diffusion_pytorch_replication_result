@@ -668,6 +668,8 @@ class Trainer(object):
 
                     milestone = self.step // self.save_and_sample_every
 
+                    '''
+
                     # INIZIO CODICE SCRITTO DA ME 
 
                     print(milestone)
@@ -692,7 +694,7 @@ class Trainer(object):
                     torch.save(self.opt.state_dict(), os.path.join(save_path, 'optim.pt'))
 
                     # FINE CODICE SCRITTO DA ME _______________________________
-                    
+                    '''
                     batches = num_to_groups(36, self.batch_size)
                     all_images_list = list(map(lambda n: self.ema_model.sample(batch_size=n), batches))
                     #all_images = torch.cat(all_images_list, dim=0)
