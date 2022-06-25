@@ -665,8 +665,8 @@ class Trainer(object):
                     all_images_list = list(map(lambda n: self.ema_model.sample(batch_size=n), batches))
                     #all_images = torch.cat(all_images_list, dim=0)
                     for i in range(len(all_images_list)):
-                        print("sampling number ---> ",i)
-                        utils.save_image(all_images_list[i], str(self.results_folder / f'sample-{i}.png'))
+                        utils.save_image(all_images_list[i], str(self.results_folder / f'sample-{i}.png'), nrow = 6)
+                        #utils.save_image(all_images, str(self.results_folder / f'sample-{milestone}.png'), nrow = 6)
                         self.save(i)
                     #self.save(milestone)
 
