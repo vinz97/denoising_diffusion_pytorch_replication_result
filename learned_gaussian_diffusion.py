@@ -117,11 +117,11 @@ class LearnedGaussianDiffusion(GaussianDiffusion):
         kl = meanflat(kl) * NAT
 
         decoder_nll = -discretized_gaussian_log_likelihood(x_start, means = detached_model_mean, log_scales = 0.5 * model_log_variance)
-        decoder_nll = meanflat(decoder_nll) * NAT
+        #decoder_nll = meanflat(decoder_nll) * NAT
 
         # at the first timestep return the decoder NLL, otherwise return KL(q(x_{t-1}|x_t,x_0) || p(x_{t-1}|x_t))
 
-        vb_losses = torch.where(t == 0, decoder_nll, kl)
+        #vb_losses = torch.where(t == 0, decoder_nll, kl)
 
         # simple loss - predicting noise, x0, or x_prev
 
@@ -129,4 +129,5 @@ class LearnedGaussianDiffusion(GaussianDiffusion):
 
         simple_losses = self.loss_fn(pred_noise, noise)
 
-        return simple_losses + vb_losses.mean() * self.vb_loss_weight
+        #return simple_losses + vb_losses.mean() * self.vb_loss_weight
+        return decoder_nll
